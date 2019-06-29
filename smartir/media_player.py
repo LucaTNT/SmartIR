@@ -27,13 +27,15 @@ CONF_UNIQUE_ID = 'unique_id'
 CONF_DEVICE_CODE = 'device_code'
 CONF_CONTROLLER_DATA = "controller_data"
 CONF_POWER_SENSOR = 'power_sensor'
+CONF_DEVICE_CLASS = 'device_class'
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_UNIQUE_ID): cv.string,
     vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
     vol.Required(CONF_DEVICE_CODE): cv.positive_int,
     vol.Required(CONF_CONTROLLER_DATA): cv.string,
-    vol.Optional(CONF_POWER_SENSOR): cv.entity_id
+    vol.Optional(CONF_POWER_SENSOR): cv.entity_id,
+    vol.Optional(CONF_DEVICE_CLASS): cv.string
 })
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
@@ -84,6 +86,7 @@ class SmartIRMediaPlayer(MediaPlayerDevice, RestoreEntity):
         self._device_code = config.get(CONF_DEVICE_CODE)
         self._controller_data = config.get(CONF_CONTROLLER_DATA)
         self._power_sensor = config.get(CONF_POWER_SENSOR)
+        self._device_class = config.get(CONF_DEVICE_CLASS)
 
         self._manufacturer = device_data['manufacturer']
         self._supported_models = device_data['supportedModels']
@@ -140,6 +143,11 @@ class SmartIRMediaPlayer(MediaPlayerDevice, RestoreEntity):
 
         if last_state is not None:
             self._state = last_state.state
+
+    @property
+    def device_class(self):
+        """Return device_class"""
+        return self._device_class
 
     @property
     def should_poll(self):
